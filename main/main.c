@@ -46,6 +46,42 @@ typedef enum {
 static led_mode_t s_mode = MODE_BLINK;
 static int64_t    s_breath_index = 0;   /* 已完成的呼吸周期数，用于串口对时 */
 
+/* ------------------------------------------------------------------------------------------------
+ * 按键消抖（非阻塞）
+ *
+ * BSP 的 key_scan() 用 esp_rom_delay_us(20000) 阻塞去抖，且先把 key_up 清 0 再复检：
+ * 手快的时候（轻点 < 20 ms）这一下会被整颗丢弃，表现为"第一次按没反应"。
+ * 这里改成 10 ms 采样 + 连续 2 次电平一致才认定跳变，既不阻塞任务，也不会吞掉短按。
+ * ---------------------------------------------------------------------------------------------- */
+static bool s_btn_level = true;    /* 去抖后的电平：true = 高（松开），false = 低（按下） */
+static int  s_btn_same  = 0;       /* 连续读到相同电平的次数 */
+static int  s_press_cnt = 0;       /* 累计按下次数，用于日志对时 */
+
+static bool key_poll_press(void)
+{
+    const bool raw = (gpio_get_level(BOOT_GPIO_PIN) != 0);   /* 1 = 松开，0 = 按下 */
+    if (raw == s_btn_level) {
+        s_btn_same = 0;
+        return false;
+    }
+    if (++s_btn_same < 2) {          /* 连续 2 次（约 20 ms）一致才认 */
+        return false;
+    }
+    s_btn_level = raw;
+    s_btn_same  = 0;
+    return (raw == false);           /* 变成低电平 = 一次按下 */
+}
+
+static const char *mode_name(led_mode_t m)
+{
+    switch (m) {
+        case MODE_BLINK:  return "1Hz 闪烁";
+        case MODE_STEADY: return "常亮";
+        case MODE_BREATH: return "呼吸灯";
+        default:          return "?";
+    }
+}
+
 /* LEDC 参数：5 kHz、12 位分辨率（4096 级，远高于作业「至少 32 级」）
  * 分辨率说明：80 MHz / 5 kHz = 16000，故 5 kHz 下最高可到 13 位；取 12 位留余量。 */
 #define BREATH_TIMER        LEDC_TIMER_0
@@ -243,15 +279,16 @@ void app_main(void)
 
     int64_t last_toggle_ms = esp_timer_get_time() / 1000;
     int64_t breath_start_ms = last_toggle_ms;
-    int     breath_cycle = 0;
 
     while (1) {
-        /* 按键：短按切换模式 */
-        if (key_scan(0) == BOOT_PRES) {
+        /* 按键：短按切换模式（非阻塞消抖，每次按下必定触发一次） */
+        if (key_poll_press()) {
             led_mode_t next = (led_mode_t)((s_mode + 1) % MODE_NUM);
+            s_press_cnt++;
+            ESP_LOGI(TAG, "KEY: 第 %d 次按下（%lld ms）→ 模式：%s",
+                     s_press_cnt, (long long)(esp_timer_get_time() / 1000), mode_name(next));
             set_mode(next);
             breath_start_ms = esp_timer_get_time() / 1000;
-            breath_cycle = 0;
         }
 
         const int64_t now_ms = esp_timer_get_time() / 1000;
