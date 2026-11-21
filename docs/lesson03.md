@@ -1,0 +1,43 @@
+﻿# 第 03 课 · LED 点灯与板级自检
+
+## 交付物
+
+| 要求 | 实现 | 证据 |
+|---|---|---|
+| 1 Hz 闪烁（500 ms 亮 / 500 ms 灭） | `main.c` 主循环 + `LED0_TOGGLE()` | 肉眼可见 / 视频 |
+| 串口日志 | `ESP_LOGI` 打印自检报告与 `LED blink start` | `docs/evidence/lesson03_boot_log.txt` |
+| 板级自检结论 | 芯片 / Flash / PSRAM / MAC / 复位原因 / LED 回读 / 按键电平 | 同上，结论 5/5 通过 |
+
+## 课后作业：呼吸灯
+
+- LEDC 定时器 5 kHz、10 位分辨率（1024 级，满足 ≥32 级要求）
+- 一个周期 2.5 s（落在 2~3 s 要求内），占空比 0 → 最大 → 0
+- 亮度做 gamma 校正（γ = 2.2），避免"前段变化快、后段不动"
+- 每个周期串口打印一次 `breath cycle = n`，便于与示波器对时
+
+## 模式切换
+
+上电默认 1Hz 闪烁，短按 BOOT 键循环切换：
+
+```
+1Hz 闪烁 → 常亮 → 呼吸灯 → 1Hz 闪烁 ...
+```
+
+每次切换都会打印当前模式。
+
+## 实测日志（2026-11-21）
+
+```
+I (811) SELFTEST: ================ 板级自检开始 ================
+I (817) SELFTEST: 芯片型号 : esp32s3（2 核，revision v0.2）
+I (826) SELFTEST: 功能     : WiFi BLE 外置Flash
+I (831) SELFTEST: Flash    : 16 MB   [通过]
+I (835) SELFTEST: PSRAM    : 8 MB   [通过]
+I (839) SELFTEST: 内部 RAM : 空闲 371 KB / 总 421 KB
+I (844) SELFTEST: MAC 地址 : 84:C7:BB:56:3E:D0   [通过]
+I (849) SELFTEST: 复位原因 : POWERON（上电）
+I (914) SELFTEST: LED0     : 点亮读回=0、熄灭读回=1（GPIO1）   [通过]
+I (914) SELFTEST: BOOT 键  : 松开电平=1（GPIO0，上拉正常）   [通过]
+I (917) SELFTEST: 结论     : 5/5 项通过
+I (935) SELFTEST: LED blink start（1Hz：500 ms 亮 / 500 ms 灭）
+```
