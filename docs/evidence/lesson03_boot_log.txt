@@ -1,0 +1,185 @@
+﻿ESP-ROM:esp32s3-20210327
+
+Build:Mar 27 2021
+
+rst:0x1 (POWERON),boot:0xb (SPI_FAST_FLASH_BOOT)
+
+SPIWP:0xee
+
+mode:DIO, clock div:1
+
+load:0x3fce2820,len:0x167c
+
+load:0x403c8700,len:0x4
+
+load:0x403c8704,len:0xe8c
+
+load:0x403cb700,len:0x3144
+
+entry 0x403c8940
+
+I (27) boot: ESP-IDF v5.3.5 2nd stage bootloader
+
+I (27) boot: compile time Nov 21 2026 10:09:08
+
+I (27) boot: Multicore bootloader
+
+I (27) boot: chip revision: v0.2
+
+I (30) boot: efuse block revision: v1.4
+
+I (33) qio_mode: Enabling default flash chip QIO
+
+I (38) boot.esp32s3: Boot SPI Speed : 80MHz
+
+I (42) boot.esp32s3: SPI Mode       : QIO
+
+I (45) boot.esp32s3: SPI Flash Size : 16MB
+
+I (49) boot: Enabling RNG early entropy source...
+
+I (54) boot: Partition Table:
+
+I (56) boot: ## Label            Usage          Type ST Offset   Length
+
+I (63) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+
+I (69) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+
+I (76) boot:  2 factory          factory app      00 00 00010000 001f0000
+
+I (82) boot:  3 vfs              Unknown data     01 81 00200000 00a00000
+
+I (89) boot:  4 storage          Unknown data     01 82 00c00000 00400000
+
+I (95) boot: End of partition table
+
+I (98) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0af50h ( 44880) map
+
+I (113) esp_image: segment 1: paddr=0001af78 vaddr=3fc93c00 size=033a4h ( 13220) load
+
+I (116) esp_image: segment 2: paddr=0001e324 vaddr=40374000 size=01cf4h (  7412) load
+
+I (122) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=1717ch ( 94588) map
+
+I (143) esp_image: segment 4: paddr=000371a4 vaddr=40375cf4 size=0dea8h ( 57000) load
+
+I (161) boot: Loaded app from partition at offset 0x10000
+
+I (161) boot: Disabling RNG early entropy source...
+
+I (171) octal_psram: vendor id    : 0x0d (AP)
+
+I (171) octal_psram: dev id       : 0x02 (generation 3)
+
+I (171) octal_psram: density      : 0x03 (64 Mbit)
+
+I (173) octal_psram: good-die     : 0x01 (Pass)
+
+I (178) octal_psram: Latency      : 0x01 (Fixed)
+
+I (182) octal_psram: VCC          : 0x01 (3V)
+
+I (186) octal_psram: SRF          : 0x01 (Fast Refresh)
+
+I (191) octal_psram: BurstType    : 0x01 (Hybrid Wrap)
+
+I (196) octal_psram: BurstLen     : 0x01 (32 Byte)
+
+I (200) octal_psram: Readlatency  : 0x02 (10 cycles@Fixed)
+
+I (205) octal_psram: DriveStrength: 0x00 (1/1)
+
+I (210) MSPI Timing: PSRAM timing tuning index: 5
+
+I (214) esp_psram: Found 8MB PSRAM device
+
+I (218) esp_psram: Speed: 80MHz
+
+I (221) cpu_start: Multicore app
+
+I (676) esp_psram: SPI SRAM memory test OK
+
+I (685) cpu_start: Pro cpu start user code
+
+I (685) cpu_start: cpu freq: 240000000 Hz
+
+I (685) app_init: Application information:
+
+I (685) app_init: Project name:     02_key
+
+I (688) app_init: App version:      1
+
+I (692) app_init: Compile time:     Nov 21 2026 10:08:55
+
+I (697) app_init: ELF file SHA256:  f7b4568f5...
+
+I (701) app_init: ESP-IDF:          v5.3.5
+
+I (705) efuse_init: Min chip rev:     v0.0
+
+I (709) efuse_init: Max chip rev:     v0.99 
+
+I (713) efuse_init: Chip rev:         v0.2
+
+I (717) heap_init: Initializing. RAM available for dynamic allocation:
+
+I (723) heap_init: At 3FC97948 len 00051DC8 (327 KiB): RAM
+
+I (728) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM
+
+I (733) heap_init: At 3FCF0000 len 00008000 (32 KiB): DRAM
+
+I (738) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM
+
+I (744) esp_psram: Adding pool of 8192K of PSRAM memory to heap allocator
+
+I (751) spi_flash: detected chip: boya
+
+I (754) spi_flash: flash io: qio
+
+I (757) sleep: Configure to isolate all GPIO pins in sleep state
+
+I (763) sleep: Enable automatic switching of GPIO sleep configuration
+
+I (769) main_task: Started on CPU0
+
+I (794) esp_psram: Reserving pool of 32K of internal memory for DMA/internal allocations
+
+I (794) main_task: Calling app_main()
+
+I (795) gpio: GPIO[1]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+
+I (802) gpio: GPIO[0]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 
+
+I (811) SELFTEST: ================ 板级自检开始 ================
+
+I (817) SELFTEST: 芯片型号 : esp32s3（2 核，revision v0.2）
+
+I (823) SELFTEST: 主频     : 240 MHz
+
+I (826) SELFTEST: 功能     : WiFi BLE 外置Flash
+
+I (831) SELFTEST: Flash    : 16 MB   [通过]
+
+I (835) SELFTEST: PSRAM    : 8 MB   [通过]
+
+I (839) SELFTEST: 内部 RAM : 空闲 371 KB / 总 421 KB
+
+I (844) SELFTEST: MAC 地址 : 84:C7:BB:56:3E:D0   [通过]
+
+I (849) SELFTEST: 复位原因 : POWERON（上电）
+
+I (914) SELFTEST: LED0     : 点亮读回=0、熄灭读回=1（GPIO1）   [通过]
+
+I (914) SELFTEST: BOOT 键  : 松开电平=1（GPIO0，上拉正常）   [通过]
+
+I (917) SELFTEST: 结论     : 5/5 项通过
+
+I (921) SELFTEST: ================ 板级自检结束 ================
+
+I (927) gpio: GPIO[1]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+
+I (935) SELFTEST: LED blink start（1Hz：500 ms 亮 / 500 ms 灭）
+
+
