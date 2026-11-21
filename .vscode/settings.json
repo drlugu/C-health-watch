@@ -1,0 +1,22 @@
+{
+    "C_Cpp.intelliSenseEngine": "default",
+    "idf.customExtraPaths": "D:\\Espressif\\tools\\xtensa-esp-elf-gdb\\16.3_20250913\\xtensa-esp-elf-gdb\\bin;D:\\Espressif\\tools\\xtensa-esp-elf\\esp-13.2.0_20250707\\xtensa-esp-elf\\bin;D:\\Espressif\\tools\\esp-clang\\16.0.1-fe4f10a809\\esp-clang\\bin;D:\\Espressif\\tools\\riscv32-esp-elf\\esp-13.2.0_20250707\\riscv32-esp-elf\\bin;D:\\Espressif\\tools\\esp32ulp-elf\\2.38_20240113\\esp32ulp-elf\\bin;D:\\Espressif\\tools\\cmake\\3.30.2\\bin;D:\\Espressif\\tools\\openocd-esp32\\v0.12.0-esp32-20251215\\openocd-esp32\\bin;D:\\Espressif\\tools\\ninja\\1.12.1\\;D:\\Espressif\\tools\\idf-exe\\1.0.3\\;D:\\Espressif\\tools\\ccache\\4.12.1\\ccache-4.12.1-windows-x86_64;D:\\Espressif\\tools\\dfu-util\\0.11\\dfu-util-0.11-win64;D:\\Espressif\\tools\\idf-python\\3.11.2;D:\\Espressif\\tools\\idf-git\\2.44.0\\cmd",
+    "idf.customExtraVars": {
+        "IDF_PATH": "D:\\Espressif\\frameworks\\esp-idf-v5.3.5",
+        "IDF_TOOLS_PATH": "D:\\Espressif",
+        "IDF_PYTHON_ENV_PATH": "D:\\Espressif\\python_env\\idf5.3_py3.11_env"
+    },
+    "idf.espIdfPathWin": "D:\\Espressif\\frameworks\\esp-idf-v5.3.5",
+    "idf.openOcdConfigs": [
+        "board/esp32s3-builtin.cfg"
+    ],
+    "idf.toolsPathWin": "D:\\Espressif",
+    "files.autoGuessEncoding": true,
+    "idf.portWin": "COM3",
+    "idf.flashType": "UART",
+    "idf.port": "/dev/ttyUSB0",
+    "idf.espIdfPath": "D:/Espressif/frameworks/esp-idf-v5.3.5",
+    "idf.toolsPath": "D:/Espressif",
+    "idf.pythonInstallPath": "D:\\Espressif\\python_env\\idf5.3_py3.11_env\\Scripts\\python.exe",
+    "idf.currentSetup": "D:\\Espressif\\frameworks\\esp-idf-v5.3.5"
+}

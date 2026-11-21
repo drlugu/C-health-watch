@@ -1,0 +1,8 @@
+﻿# 构建产物（可重新生成，不入库）
+build/
+sdkconfig.old
+
+# 编辑器/系统
+.vscode/*.log
+.DS_Store
+Thumbs.db
