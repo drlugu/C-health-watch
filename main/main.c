@@ -44,14 +44,17 @@ typedef enum {
 } led_mode_t;
 
 static led_mode_t s_mode = MODE_BLINK;
+static int64_t    s_breath_index = 0;   /* 已完成的呼吸周期数，用于串口对时 */
 
-/* LEDC 参数：5 kHz、10 位分辨率（1024 级），满足作业「至少 32 级」 */
+/* LEDC 参数：5 kHz、12 位分辨率（4096 级，远高于作业「至少 32 级」）
+ * 分辨率说明：80 MHz / 5 kHz = 16000，故 5 kHz 下最高可到 13 位；取 12 位留余量。 */
 #define BREATH_TIMER        LEDC_TIMER_0
 #define BREATH_CHANNEL      LEDC_CHANNEL_0
-#define BREATH_RES          LEDC_TIMER_10_BIT
+#define BREATH_RES          LEDC_TIMER_12_BIT
 #define BREATH_FREQ_HZ      5000
-#define BREATH_FULL         1023
+#define BREATH_FULL         4095
 #define BREATH_PERIOD_MS    2500    /* 一个呼吸周期 2.5 s，落在作业要求的 2~3 s */
+#define BREATH_STEP_MS      10      /* 每 10 ms 更新一次占空比：一个周期 250 级 */
 
 /* ------------------------------------------------------------------------------------------------
  * 板级自检
@@ -190,11 +193,10 @@ static void breath_init(void)
     ledc_stop(LEDC_LOW_SPEED_MODE, BREATH_CHANNEL, 1);   /* 空闲电平 1 = 灭 */
 }
 
-static void breath_set_brightness(float x)   /* x: 0.0 ~ 1.0 */
+static void breath_set_brightness(float b)   /* b: 0.0（全灭）~ 1.0（全亮） */
 {
-    /* gamma 校正：人眼对亮度非线性，直接线性扫会显得"前段变化快、后段不动" */
-    float corrected = powf(x, 2.2f);
-    uint32_t duty = BREATH_FULL - (uint32_t)(corrected * BREATH_FULL);
+    /* LED0 低电平点亮：占空比越大越暗，所以用 FULL - b 取反 */
+    uint32_t duty = BREATH_FULL - (uint32_t)(b * (float)BREATH_FULL + 0.5f);
     ledc_set_duty(LEDC_LOW_SPEED_MODE, BREATH_CHANNEL, duty);
     ledc_update_duty(LEDC_LOW_SPEED_MODE, BREATH_CHANNEL);
 }
@@ -217,7 +219,9 @@ static void set_mode(led_mode_t mode)
             break;
         case MODE_BREATH:
             breath_init();
-            ESP_LOGI(TAG, "模式切换：呼吸灯（5 kHz PWM，周期 %d ms）", BREATH_PERIOD_MS);
+            s_breath_index = 0;
+            ESP_LOGI(TAG, "模式切换：呼吸灯（5 kHz PWM，12 位分辨率，周期 %d ms，%d 级/周期）",
+                     BREATH_PERIOD_MS, BREATH_PERIOD_MS / BREATH_STEP_MS);
             break;
         default:
             break;
@@ -235,7 +239,7 @@ void app_main(void)
     board_self_check();
 
     breath_init();          /* 先把 LEDC 配好，切到呼吸模式时直接可用 */
-    set_mode(MODE_BLINK);   /* 上电默认 1Hz 闪烁 */
+    set_mode(MODE_BLINK);   /* 上电默认 1Hz 闪烁（课件要求） */
 
     int64_t last_toggle_ms = esp_timer_get_time() / 1000;
     int64_t breath_start_ms = last_toggle_ms;
@@ -264,22 +268,20 @@ void app_main(void)
                 break;   /* 已在切换时点亮 */
 
             case MODE_BREATH: {
-                const int64_t elapsed = now_ms - breath_start_ms;
+                const int64_t elapsed  = now_ms - breath_start_ms;
                 const int64_t cycle_ms = elapsed % BREATH_PERIOD_MS;
-                const float   phase = (float)cycle_ms / (float)BREATH_PERIOD_MS;
-                /* 三角波 0 → 1 → 0 */
-                const float   v = (phase < 0.5f) ? (phase * 2.0f) : (2.0f - phase * 2.0f);
-                breath_set_brightness(v);
+                const float   phase    = (float)cycle_ms / (float)BREATH_PERIOD_MS;
+
+                /* 正弦呼吸曲线：两端导数为 0，肉眼看不出拐点；
+                 * 相位 0 → 全灭，0.5 → 全亮，1 → 全灭，整个周期都在连续变化。 */
+                const float b = 0.5f - 0.5f * cosf(2.0f * (float)M_PI * phase);
+                breath_set_brightness(b);
 
                 /* 每完成一个周期打印一次，便于与示波器对时 */
-                static int64_t last_cycle_index = -1;
-                const int64_t cycle_index = elapsed / BREATH_PERIOD_MS;
-                if (cycle_index != last_cycle_index) {
-                    last_cycle_index = cycle_index;
-                    breath_cycle = (int)cycle_index;
-                    if (breath_cycle > 0) {
-                        ESP_LOGI(TAG, "breath cycle = %d", breath_cycle);
-                    }
+                const int64_t idx = elapsed / BREATH_PERIOD_MS;
+                if (idx > s_breath_index) {
+                    s_breath_index = idx;
+                    ESP_LOGI(TAG, "breath cycle = %d", (int)idx);
                 }
                 break;
             }
@@ -288,6 +290,6 @@ void app_main(void)
                 break;
         }
 
-        vTaskDelay(pdMS_TO_TICKS(20));   /* 20 ms 调度粒度，不忙等 */
+        vTaskDelay(pdMS_TO_TICKS(BREATH_STEP_MS));   /* 10 ms 更新一次，不忙等 */
     }
 }
